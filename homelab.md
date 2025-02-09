@@ -30,6 +30,7 @@
 
 Sources :
 - Thank you, Stephane Robert for this ressource ! [blog.stephane-robert.info](https://blog.stephane-robert.info/docs/virtualiser/type1/proxmox/terraform/#configuration-de-proxmox)
+- [dev.to](https://dev.to/marksie1988/proxmox-template-with-cloud-image-and-cloud-init-3660)
 
 Role creation `TerraformProv` for specific Terraform user which we will use to deploy ressources on Proxmox
 
@@ -76,5 +77,100 @@ wget https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-
 ```
 
 ```bash
-sudo virt-customize -a ubuntu-20.04-server-cloudimg-amd64.img --install qemu-guest-agent
+# This command show me network issues like DHCP configuraiton and DNS resolution fail
+virt-customize -a ubuntu-20.04-server-cloudimg-amd64.img --install qemu-guest-agent
 ```
+
+Change root's password
+
+```bash
+virt-customize -a debian-12-generic-amd64.qcow2 --root-password password:<password>
+```
+
+New virtual machine creation
+
+```bash
+qm create 10000 --name "debian12-template" --memory 2048 --cores 2 --net0 virtio,bridge=vmbr0
+```
+
+Setup tags to this virtual machine
+
+```bash
+qm set 10000 --tags "template,debian"
+```
+
+Setup disk on this new virtual machine
+
+```bash
+qm importdisk 10000 debian-12-generic-amd64.qcow2 local-lvm
+```
+
+Attach disk previously created
+
+```bash
+qm set 10000 --scsihw virtio-scsi-pci --scsi0 local:10000/vm-10000-disk-0
+```
+
+Add cloud-init drive
+
+```bash
+qm set 10000 --ide2 local-lvm:cloudinit
+```
+
+Make the cloudinit drive bootable
+
+```bash
+qm set 10000 --boot c --bootdisk scsi0
+```
+
+Add serial Console
+
+```bash
+qm set 10000 --serial0 socket --vga serial0
+```
+
+Turn on guest-agent
+
+```bash
+qm set 10000 --agent enabled=1
+```
+
+Turn on DHCP
+
+```bash
+qm set 10000 --ipconfig0 ip=dhcp
+```
+
+Template creation from our image
+
+```bash
+qm template 10000
+```
+
+---
+
+### 1.4. Terraform with Proxmox PoC
+
+Terraform file
+
+```json
+provider "proxmox" {
+  endpoint = "https://<proxmox_ip>:8006/"
+  api_token = var.api_token
+  insecure = true
+  ssh {
+    agent = true
+    username = "root"
+  }
+}
+```
+
+Create variables.tf file 
+
+```json
+variable "api_token" {
+  description = "<token>"
+  type = string
+}
+```
+
