@@ -7,7 +7,7 @@
 Le homelab va être divisé en deux vlans principaux. Le premier ayant pour objectif d'héberger les divers services utiles au bon fonctionnement du homelab. Le second sera dédié au déploiement et à l'utilisation des VMs et containers pour les tests futures de technologie, OS, etc.
 
 | Nom      | Description      | VLAN      | Adressage      |
-|---    |:-:    |:-:    |:-:    |--:    |
+|---    |:-:    |:-:    |:-:    |
 | Core      | Environnement de base du homelab      | 100      | 192.168.100.0/24      |
 | VMS      | Environnement de déploiement des VMs      | 200      | 192.168.200.0/24      |
 
@@ -45,7 +45,7 @@ Afin de facilité l'administration du homelab et l'utilisation des différents s
 
 # 3. Schéma réseau physique
 
-![alt text](schéma_physique.png)
+![alt text](schema_physique.png)
 
 ---
 
@@ -102,4 +102,4 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
     - [ ] Installation du DNS (Bind9)
         - [ ] Mise en place de l'OS via les templates
         - [ ] Installation de bind9
-        - [ ] Configuration de la zone DNS et du forwarder
+        - [ ] Configuration de la zone DNS et du forwarderœ
