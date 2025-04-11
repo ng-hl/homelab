@@ -83,7 +83,11 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
 ## 🐟
 
 - [ ] Niveau 1
-    - [ ] Installation de Proxmox VE
+    - [x] Installation de Proxmox VE
+    - [x] Configuration de Proxmox VE
+        - [x] Création de l'utilisateur d'administration
+        - [x] Mise en place des bons dépôts pour l'update
+        - [x] Mise en place de la sauvegarde déportée
     - [ ] Configuration des VLAN sur Proxmox VE
     - [ ] Installation de PFSense
         - [ ] Importer l'ISO de PFSense
