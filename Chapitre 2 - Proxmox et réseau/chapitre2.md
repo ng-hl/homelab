@@ -1,4 +1,4 @@
-> Ce document contient les livrables issues de la phase d'installation et de configuration de Proxmox VE ainsi que des VLAN au sein du homelab. Ces éléments constituent la base (le core) de notre infrastructure.
+> Ce document contient les livrables issues de la phase d'installation et de configuration de Proxmox VE ainsi que des sous-réseaux au sein du homelab. Ces éléments constituent la base (le core) de notre infrastructure.
 
 ---
 
@@ -65,6 +65,37 @@ Il est tout à fait possible de tester notre configuration en exécutant le job 
 
 ![alt text](backup-result.png)
 
+## 2.4. Désactivation du message concernant l'absence de licence valide
 
+Si l'on ne dispose pas d'une licence valide pour Proxmox Entreprise, à chaque connexion une popup d'avertissement apparaîtra. Pour enlever ce comportement, il y a deux choix possibles. La première, acquérir une licence valide et l'associée à son cluster Proxmox VE et la seconde consiste à enlever le code responsable de cette apparition directement sur le serveur Proxmox VE. Nous allons procéder à la seconde méthode.
 
+```bash
+# Sauvegarde du fichier avant modification
+cp /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js.bak
+```
+
+```bash
+# Modification du fichier
+vim /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+```
+
+Il faut que l'on modifie la ligne suivante `.data.status.toLowerCase() !== 'active') {` avec ce code-ci `.data.status.toLowerCase() !== 'active') { orig_cmd(); } else if ( false ) {`
+
+Enfin, il ne nous reste plus qu'à relancer le service `pveproxy`
+
+```bash
+systemctl restart pveproxy
+```
+
+---
+
+# 3. Réseau
+
+Par défaut, une première interface est initialisée sur Proxmox, la `vmbr0`. Cette dernière est un bridge, c'est à dire qu'elle offre un accés par pont directement sur mon réseau local. L'objectif est de mettre en place deux interfaces supplémentaires `vmbr1` et `vmbr2`.
+
+Pour réaliser ces opérations, il faut cliquer sur la section `pve` (nom de mon cluster Proxmox) et `Network`. Nous créons deux interfaces. `vmbr1` qui correspond au réseau `core` en 192.168.100.0/24 et `vmbr2` qui correspond au réseau `vms` en 192.168.200.0/24.
+
+Voici un exemple de configuration avec `vmbr1`
+
+![alt text](configure-int.png)
 

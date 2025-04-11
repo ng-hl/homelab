@@ -15,12 +15,12 @@ Pour mettre en place ce homelab, il nous faut un appareil qui dispose de suffise
 
 # 1. Les environnements
 
-Le homelab va être divisé en deux vlans principaux. Le premier ayant pour objectif d'héberger les divers services utiles au bon fonctionnement du homelab. Le second sera dédié au déploiement et à l'utilisation des VMs et containers pour les tests futures de technologie, OS, etc.
+Le homelab va être divisé en deux sous-réseaux principaux. Le premier ayant pour objectif d'héberger les divers services utiles au bon fonctionnement du homelab. Le second sera dédié au déploiement et à l'utilisation des VMs et containers pour les tests futures de technologie, OS, etc.
 
-| Nom      | Description      | VLAN      | Adressage      |
-|---    |:-:    |:-:    |:-:    |
-| Core      | Environnement de base du homelab      | 100      | 192.168.100.0/24      |
-| VMS      | Environnement de déploiement des VMs      | 200      | 192.168.200.0/24      |
+| Nom      | Description      | Adressage      |
+|:-:    |---    |---    |
+| Core      | Environnement de base du homelab      | 192.168.100.0/24      |
+| VMS      | Environnement de déploiement des VMs      | 192.168.200.0/24      |
 
 ---
 
@@ -88,7 +88,8 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [x] Création de l'utilisateur d'administration
         - [x] Mise en place des bons dépôts pour l'update
         - [x] Mise en place de la sauvegarde déportée
-    - [ ] Configuration des VLAN sur Proxmox VE
+        - [x] Configuration des interfaces vmbr1 et vmbr2
+        - [ ] Tester le bon fonctionnement
     - [ ] Installation de PFSense
         - [ ] Importer l'ISO de PFSense
         - [ ] Configurer la VM avec deux interface (vmbr0 et vmbr1)
