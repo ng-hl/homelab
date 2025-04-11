@@ -89,7 +89,7 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [x] Mise en place des bons dépôts pour l'update
         - [x] Mise en place de la sauvegarde déportée
         - [x] Configuration des interfaces vmbr1 et vmbr2
-        - [ ] Tester le bon fonctionnement
+        - [x] Tester le bon fonctionnement
     - [ ] Installation de PFSense
         - [ ] Importer l'ISO de PFSense
         - [ ] Configurer la VM avec deux interface (vmbr0 et vmbr1)

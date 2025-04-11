@@ -99,3 +99,5 @@ Voici un exemple de configuration avec `vmbr1`
 
 ![alt text](configure-int.png)
 
+Pour tester que cela fonctionne correctement, nous allons exécuter deux container alpine. Le premier container avec une interface réseau positionné sur `vmbr1` et le second sur `vmbr2`, puis nous allons installer le package `iputils-ping` pour disposer du ping et vérifier que nos container sont dans l'incapacité de communiquer entre eux.
+
