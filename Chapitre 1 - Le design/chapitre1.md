@@ -84,22 +84,31 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [ ] Installer l'OS avec les éléments suivants
             - [ ] Nom : debian12-template.homelab
             - [ ] Disque : LVM partionnement manuel
-            - [ ] Service : opensessh-server
-            - [ ] Création de l'utilisateur
+            - [ ] Service : openssh-server
+            - [ ] Utilisateur : Création de l'utilisateur d'administration
+            - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
+            - [ ] Utilisateur : Création de l'utilisateur ansible
+            - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible
+            - [ ] SSH : Modifier le fichier de configuration /etc/ssh/sshd_config
             - [ ] Réseau : Configuration statique 192.168.30.1/24
-            - [ ] Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
             - [ ] Tester le bon fonctionnement avec le déploiement d'un VM de test
     - [ ] Créer un template de RockyLinux 9
         - [ ] Importer l'ISO de RockyLinux 9
         - [ ] Installer l'OS avec les éléments suivants
             - [ ] Nom : rockylinux9-template.homelab
             - [ ] Disque : LVM partionnement manuel
-            - [ ] Service : opensessh-server
-            - [ ] Création de l'utilisateur
+            - [ ] Service : openssh-server
+            - [ ] Utilisateur : Création de l'utilisateur d'administration
+            - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
+            - [ ] Utilisateur : Création de l'utilisateur ansible
+            - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible
+            - [ ] SSH : Modifier le fichier de configuration /etc/ssh/sshd_config
             - [ ] Réseau : Configuration statique 192.168.30.2/24
-            - [ ] Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
             - [ ] Tester le bon fonctionnement avec le déploiement d'un VM de test
     - [ ] Installation du DNS (Bind9)
         - [ ] Mise en place de l'OS via les templates
         - [ ] Installation de bind9
-        - [ ] Configuration de la zone DNS et du forwarderœ
+        - [ ] Configuration de la zone DNS et du forwarder
+        - [ ] Modification de la configuration du résolveur DNS pour admin-core
+        - [ ] Test de la résolution interne depuis admin-core
+        - [ ] Test de la résolution externe depuis admin-core
