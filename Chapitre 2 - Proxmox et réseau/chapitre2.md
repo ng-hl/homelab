@@ -22,8 +22,49 @@ J'ai récupéré une image ISO sur le [site officiel de Proxmox](https://www.pro
 
 # 2. Configuration de base de Proxmox VE
 
+## 2.1. Création d'un utilisateur d'administration
+
 La première étape est de créer un utilisateur appartenant au groupe "Admin" afin de pouvoir se connecter via le Realm "Proxmox VE authentication server" et non pas avec l'utilisateur standard "root" via "Linux PAM". Pour cela, il faut être dans la vue "Server View", cliquer sur "Datacenter", se rendre dans la section "Permissions", puis "Users" et enfin cliquer sur le bouton "Add".
 
 ![alt text](creation_utilisateur_admin.png)
 
 Il est important d'ajouter le groupe "Admin" dans la section "Group" afin que notre utilisateur puisse disposer de toutes les permissions nécessaires.
+
+## 2.2. Configuration des dépôts pour les mises à jour
+
+Par défaut, sur une installation fraîche de Proxmox VE, des dépôts dans la section "Updates" puis "Repositories" pointent vers des URL adaptées pour la version Entreprise. 
+Il est nécessaire de désactiver les dépôts qui pointent vers des dépôts Entreprise et d'activer les dépôts "no-subscription" en cliquant sur "Add" et en sélectionnant "No-Subscription" dans le menu déroulant.
+
+![alt text](repos-configuration-1.png)
+
+Voici la configuration que j'obtiens après ces manipulations. A noter, que j'ai désactivé également les dépôts Ceph car ce n'est pas une fonctionnalité que j'utilise dans mon homelab pour le moment.
+
+![alt text](repos-configuration-2.png)
+
+A présent, il ne reste plus qu'à rafraîchir le contenu du cache du gestionnaire de package côté système de Proxmox VE en cliquant sur "Updates" puis "Refresh".
+
+![alt text](update.png)
+
+C'est l'équivalent d'un `sudo apt update` sur une GNU/Linux Debian par exemple.
+
+Enfin, pour mettre à jour les paquets remontés par le refraîchissement précédemment effectué, il est nécessaire de se connecter en tant que root ou via un utilisateur appartenant au groupe `sudo` (ce qui n'est pas le cas lorsque l'on a une installation par défaut de Proxmox VE) via le Realm PAM. Une fois que l'on clique dur "Update" une fenêtre console du système apparaît et nous demande confirmation. C'est comme si nous faisions un `sudo apt upgrade` directement via la cli.
+
+![alt text](upgrade.png)
+
+Il est important de faire les opérations d'upate et d'upgrade régulièrement pour maintenir le système de Proxmox VE à jour. C'est tout aussi simple de passer directement via la cli `apt update && apt upgrade -y`. Il est possible d'envisager de créer un cron pour exécuter cette action régulièrement.
+
+## 2.3. Mise en place de la sauvegarde
+
+J'ai un serveur NAS Synology sur lequel j'ai ajouté un répertoire partagé sur le réseau appelé "Proxmox_backups". Pour l'ajouter au niveau de Proxmox VE, il faut se rendre dans la section "Storage", cliquer sur "Add, sélectionner le type "SMB" et renseigner les informations nécessaires (IP, nom d'utilisateur, mot de passe et le nom du répertoire partagé). Je choisi d'inclure les "Disk images", "VZDump backup file" et "Container".
+
+Pour que les sauvegardes fonctionnent, il faut à présent ajouter une politique de sauvegarde pour cela on se rend dans le menu "Backups" puis on clique sur "Add". Je choisi de mettre en place une programmation des sauvegardes tous les jours à minuit et d'appliquer la politique de sauvegarde sur l'unique VM que j'ai pour le moment. Tant que la création de VM n'est pas automatisée, il faudra penser à activer la sauvegarde pour chaque VM que l'on souhaite (celles du core). Concernant la rétention, je choisi de conserver les 5 dernières sauvegardes.
+
+![alt text](backup-configuration.png)
+
+Il est tout à fait possible de tester notre configuration en exécutant le job de sauvegarde maintenant grâce au bouton "Run now". Une fois fait, il faut se rendre au niveau du storage de sauvegarde pour observer le résultat.
+
+![alt text](backup-result.png)
+
+
+
+
