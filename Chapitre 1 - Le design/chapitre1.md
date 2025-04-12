@@ -90,11 +90,11 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [x] Mise en place de la sauvegarde déportée
         - [x] Configuration des interfaces vmbr1 et vmbr2
         - [x] Tester le bon fonctionnement
-    - [ ] Installation de PFSense
-        - [ ] Importer l'ISO de PFSense
-        - [ ] Configurer la VM avec deux interface (vmbr0 et vmbr1)
-        - [ ] Installer l'OS via l'ISO
-        - [ ] Rendre disponible l'interface d'administration depuis le WAN (réseau local)
+    - [x] Installation de PFSense
+        - [x] Importer l'ISO de PFSense
+        - [x]  Configurer la VM avec trois interfaces (vmbr0 et vmbr1)
+        - [x] Installer l'OS via l'ISO
+        - [x] Rendre disponible l'interface d'administration depuis le WAN (réseau local)
     - [ ] Créer un template de Debian 12
         - [ ] Importer l'ISO de Debian 12
         - [ ] Installer l'OS avec les éléments suivants
