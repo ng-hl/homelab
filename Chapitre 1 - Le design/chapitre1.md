@@ -92,16 +92,16 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [x] Tester le bon fonctionnement
     - [x] Installation de PFSense
         - [x] Importer l'ISO de PFSense
-        - [x]  Configurer la VM avec trois interfaces (vmbr0 et vmbr1)
+        - [x] Configurer la VM avec trois interfaces (vmbr0, vmbr1 et vmbr2)
         - [x] Installer l'OS via l'ISO
         - [x] Rendre disponible l'interface d'administration depuis le WAN (réseau local)
     - [ ] Créer un template de Debian 12
-        - [ ] Importer l'ISO de Debian 12
-        - [ ] Installer l'OS avec les éléments suivants
-            - [ ] Nom : debian12-template.homelab
-            - [ ] Disque : LVM partionnement manuel
+        - [x] Importer l'ISO de Debian 12
+        - [x] Installer l'OS avec les éléments suivants
+            - [x] Nom : debian12-template.homelab
+            - [x] Disque : LVM partionnement manuel
             - [ ] Service : openssh-server
-            - [ ] Utilisateur : Création de l'utilisateur d'administration
+            - [x] Utilisateur : Création de l'utilisateur d'administration
             - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
             - [ ] Utilisateur : Création de l'utilisateur ansible
             - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible
@@ -109,12 +109,12 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
             - [ ] Réseau : Configuration statique 192.168.30.1/24
             - [ ] Tester le bon fonctionnement avec le déploiement d'un VM de test
     - [ ] Créer un template de RockyLinux 9
-        - [ ] Importer l'ISO de RockyLinux 9
-        - [ ] Installer l'OS avec les éléments suivants
-            - [ ] Nom : rockylinux9-template.homelab
-            - [ ] Disque : LVM partionnement manuel
+        - [x] Importer l'ISO de RockyLinux 9
+        - [x] Installer l'OS avec les éléments suivants
+            - [x] Nom : rocky9-template.homelab
+            - [x] Disque : LVM partionnement manuel
             - [ ] Service : openssh-server
-            - [ ] Utilisateur : Création de l'utilisateur d'administration
+            - [x] Utilisateur : Création de l'utilisateur d'administration
             - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur de la machine de gestion centralisée
             - [ ] Utilisateur : Création de l'utilisateur ansible
             - [ ] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible

@@ -6,13 +6,24 @@
 
 Aprés avoir récupéré l'ISO de pfSense que le site officiel, plus précisément sur le dépôt officiel car il faut s'inscrire pour obtenir l'ISO de puis le site, j'ai installé pfSense avec une configuration classique sans apporté de particularités majeures.
 
+---
+
+# 2. Configuration de pfSense
+
 Ce que l'on souhaite, c'est l'association interfaces / réseau ci-dessous :
 
-| Interface      | Réseau pfSense     | Sous-réseau
-|:-:    |:-:    |:-:    |
-| vmbr0     | WAN      | Réseau local (maison) |
-| vmbr1     | LAN      | Réseau Core (homelab) |
-| vmbr2     | OPT      | Réseau VMS (homelab) |
+| Interface      | Réseau pfSense     | Sous-réseau | Adresse
+|:-:    |:-:    |:-:    |:-:
+| vmbr0     | WAN      | Réseau local (maison) | DHCP
+| vmbr1     | CORE      | Réseau Core (homelab) | 192.168.100.254
+| vmbr2     | VMS     | Réseau VMS (homelab) | 192.168.200.254
 
+![alt text](interfaces-configuration.png)
+
+Il est important de désactiver les options `Block private networks and loopback addresses` et `Block bogon networks` cae l'interface WAN se trouve sur un réseau local en 192.168.1.0/24.
+
+Afin de rendre l'interface webgui de pfSense accessible depuis le WAN, il est nécessaire d'ajouter une règle au niveau de cette interface.
+
+![alt text](webgui-rule.png)
 
 
