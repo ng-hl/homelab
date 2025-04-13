@@ -24,3 +24,41 @@ Les opérations sont les mêmes pour les deux distributions. Au niveau de Proxmo
 | Domaine      | homelab                | homelab
 | Partitionnement     | LVM (/boot 512Mo, / 10Go, /home 3Go, /var 5Go, SWAP 1Go )      | LVM (/boot 512Mo, / 10Go, /home 3Go, /var 5Go, SWAP 1Go )
 
+# 3. Configuration basique de l'OS
+
+Voici la procédure utilisée pour configurer l'OS qui va servir de template
+
+```bash
+# Mise à jour du cache du gestionnaire de paquet et mise à jour des packages
+apt update && apt upgrade -y
+```
+
+```bash
+# Installation du serveur openssh et sudo
+apt install -y openssh-server sudo
+```
+
+```bash
+# Création de l'utilisateur ansible
+sudo useradd --create-home --shell /bin/bash --groups sudo ansible
+```
+
+Nous allons créer les paires de clés pour l'utilisateur d'administration `ngobert` ainsi que pour l'utilisateur `ansible`.
+
+```bash
+sudo mkdir /root/identites
+sudo ssh-keygen -t ed25519 -f /root/identites/id_admin -C "Utilisateur d'administration"
+sudo ssh-keygen -t ed25519 -f /root/identites/id_ansible -C "Utilisateur Ansible"
+```
+
+Ces clés doivent être stockées dans un environnement sécurisée. On peut autoriser notre clé privée à se connecter sur les machines en collant le contenu de la clé publique (*.pub) au niveau du fichier `/home/ngobert/.ssh/authorized_keys`
+
+```bash
+# Configuration du réseau (adresse IP standard non utilisable dans ce contexte)
+sudo vim /etc/network/interfaces
+[...]
+auto eth0
+iface eth0 inet static
+    address 192.168.30.1/24 # Pour Debian12 et .2 pour RockyLinux9
+    gateway 192.168.30.254
+```
