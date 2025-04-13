@@ -30,7 +30,11 @@ Voici la procédure utilisée pour configurer l'OS qui va servir de template
 
 ```bash
 # Mise à jour du cache du gestionnaire de paquet et mise à jour des packages
+# Debian12
 apt update && apt upgrade -y
+
+# Rocky9
+sudo yum update -y
 ```
 
 ```bash
@@ -51,14 +55,18 @@ sudo ssh-keygen -t ed25519 -f /root/identites/id_admin -C "Utilisateur d'adminis
 sudo ssh-keygen -t ed25519 -f /root/identites/id_ansible -C "Utilisateur Ansible"
 ```
 
-Ces clés doivent être stockées dans un environnement sécurisée. On peut autoriser notre clé privée à se connecter sur les machines en collant le contenu de la clé publique (*.pub) au niveau du fichier `/home/ngobert/.ssh/authorized_keys`
+Ces clés doivent être stockées dans un environnement sécurisée. On peut autoriser notre clé privée à se connecter sur les machines en collant le contenu de la clé publique (*.pub) au niveau du fichier `/home/ngobert/.ssh/authorized_keys` et du fichier `/home/ansible/.ssh/authorized_keys`
 
 ```bash
 # Configuration du réseau (adresse IP standard non utilisable dans ce contexte)
+# Debian12
 sudo vim /etc/network/interfaces
 [...]
 auto eth0
 iface eth0 inet static
     address 192.168.30.1/24 # Pour Debian12 et .2 pour RockyLinux9
     gateway 192.168.30.254
+
+# Rocky9
+nmtui
 ```
