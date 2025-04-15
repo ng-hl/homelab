@@ -60,7 +60,7 @@ sudo apt install -y bind9 bind9-doc
 
 ---
 
-# 4. COnfiguration de bind9
+# 4. Configuration de bind9
 
 La première chose que nous allons faire est de configurer le forwarder vers notre `pfSense` en `192.168.100.254`. Ainsi, lorsque nous souhaiterons faire une requête DNS qui n'est pas couverte par notre serveur bind9 la requête sera forwarder vers pfSense qui lui même va renvoyer la requête sur ma box internet sur mon réseau local. Mes VM auront pourrons donc résoudre les noms de domaine d'Internet, non déclarés sur mon bind9. Pour cela, nous éditons le fichier `/etc/bind9/named.conf.options`
 
@@ -79,14 +79,100 @@ zone "homelab" {
     file "/etc/bind/db.homelab";
 }
 
-zone "192.168.in-addr.arpa" {
+zone "168.192.in-addr.arpa" {
     type master;
     file "/etc/bind/db.192.168";
 }
 ```
 
-Maintenant, nous créons le fichier `db.homelab` qui va être le fichier descriptif de la zone couvrant le nom de domaine `.homelab`
+Maintenant, nous créons le fichier `/etc/bind/db.homelab` qui va être le fichier descriptif de la zone couvrant le nom de domaine `.homelab`
 
 ```bash
+;
+; BIND data file for local homelab zone
+;
+$TTL    604800
+@       IN      SOA     homelab. root.homelab. (
+                        2504151         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      dns-core.homelab.
 
+; CORE
+dns-core        IN      A       192.168.100.253
+admin-core      IN      A       192.168.100.252
 ```
+
+Enfin, nous créons le fichier `/etc/bind/db.100.168.192` qui va être le fichier descriptif pour le résolution DNS inverse concernant le domaine `.homelab`
+
+```bash
+;
+; BIND reverse data file for local homelab zone
+;
+$TTL    604800
+@       IN      SOA     dns-core.homelab. root.homelab. (
+                        2504151         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      dns-core.homelab.
+
+; CORE
+253 IN      PTR     dns-core.homelab.
+252 IN      PTR     admin-core.homelab.
+```
+
+On peut vérifier la syntaxe de nos fichiers de zones avec les commandes suivantes
+
+```bash
+# Zone homelab
+sudo named-checkzone homelab /etc/bind/db.homelab 
+zone homelab/IN: loaded serial 2504151
+OK
+
+# Zone inverse homelab
+sudo named-checkzone 100.168.192.in-addr.arpa /etc/bind/db.100.168.192 
+zone 100.168.192.in-addr.arpa/IN: loaded serial 2504151
+OK
+```
+
+Une fois que la syntaxe de fichier de configuration des zones bind précédemment éditer est correcte, nous pouvons recharger le daemon `bind9` pour appliquer les modifications.
+
+```bash
+sudo systemctl reload bind9
+```
+
+On peut également vérifier que le service est bel et bien exécuter
+
+```bash
+sudo systemctl status bind9
+```
+
+---
+
+# 5. Vérification
+
+Pour le moment, nous ne disposons que d'une seule VM, `dns-core`. Cependant, nous pouvons vérifier directement sur ce noeud que le service DNS répond correctement avec les enregistrements DNS que nous avons ajoutés au niveau des fichiers de configuration pour la zone `.homelab` que ce soit pour la recherche DNS directe ou inverse.
+
+```bash
+# Test résolution DNS
+dig +short @192.168.100.253 dns-core.homelab
+192.168.100.253
+
+dig +short @192.168.100.253 admin-core.homelab
+192.168.100.252
+
+# Test pour la résolution DNS inversée
+dig -x 192.168.100.253 @192.168.100.253 +short
+dns-core.homelab.
+
+dig -x 192.168.100.252 @192.168.100.253 +short
+admin-core.homelab.
+```
+
+Le serveur DNS avec le service `bind9` est à présent fonctionnel.
