@@ -1,4 +1,4 @@
-> Ce document contient les livrables issues de la phase de design du homelab. On doit se poser les bonnes questions pour répondre efficacement au besoin de départ, à savoir, disposer d'un environnement où l'on peut déployer rapidement des serveurs prêt à l'emploi pour divers cas d'usage.
+> Ce document contient les livrables issus de la phase de design du homelab. On doit se poser les bonnes questions pour répondre efficacement au besoin de départ, à savoir, disposer d'un environnement où l'on peut déployer rapidement des serveurs prêt à l'emploi pour divers cas d'usage.
 
 ---
 
@@ -106,8 +106,8 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
             - [x] Utilisateur : Création de l'utilisateur ansible (group sudo)
             - [x] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible
             - [x] Réseau : Configuration statique 192.168.30.1/24
-            - [x] Tester le bon fonctionnement avec le déploiement d'un VM de test
-            - [x] Convertir en tant que template
+        - [x] Tester le bon fonctionnement avec le déploiement d'une VM de test
+        - [x] Convertir en tant que template
     - [x] Créer un template de RockyLinux 9
         - [x] Importer l'ISO de RockyLinux 9
         - [x] Installer l'OS avec les éléments suivants
@@ -119,8 +119,8 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
             - [x] Utilisateur : Création de l'utilisateur ansible
             - [x] Authentification : Intégrer la clé SSH publique de l'utilisateur ansible
             - [x] Réseau : Configuration statique 192.168.30.2/24
-            - [x] Tester le bon fonctionnement avec le déploiement d'un VM de test
-            - [x] Convertir en tant que template
+        - [x] Tester le bon fonctionnement avec le déploiement d'une VM de test
+        - [x] Convertir en tant que template
     - [x] Installation du DNS (Bind9)
         - [x] Mise en place de l'OS via les templates
         - [x] Activer la sauvegarde depuis Proxmox

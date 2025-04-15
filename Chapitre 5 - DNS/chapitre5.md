@@ -1,4 +1,4 @@
-> Ce document contient les livrables issues de la phase d'installation et de configuration du service DNS avec `bind9`. L'objectif est de pouvoir disposer d'un service DNS concernant notre zone .homelab. accessible au sein du homelab et depuis mon réseau local.
+> Ce document contient les livrables issus de la phase d'installation et de configuration du service DNS avec `bind9`. L'objectif est de pouvoir disposer d'un service DNS concernant notre zone .homelab. accessible au sein du homelab et depuis mon réseau local.
 
 ---
 

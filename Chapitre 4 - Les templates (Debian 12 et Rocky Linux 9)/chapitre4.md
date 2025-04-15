@@ -1,4 +1,4 @@
-> Ce document contient les livrables issues de la phase de création des templates pour les OS Debian 12 et Rocky Linux 9. L'objectif est de pouvoir disposer de templates de VM afin de créer facilement des clône complet pour avoir une configuration de base pour l'ensemble de nos VM (utilisateur, clés SSH, installation d'openssh-server, ...)
+> Ce document contient les livrables issus de la phase de création des templates pour les OS Debian 12 et Rocky Linux 9. L'objectif est de pouvoir disposer de templates de VM afin de créer facilement des clône complet pour avoir une configuration de base pour l'ensemble de nos VM (utilisateur, clés SSH, installation d'openssh-server, ...)
 
 ---
 

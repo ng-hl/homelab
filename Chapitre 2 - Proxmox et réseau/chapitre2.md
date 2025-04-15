@@ -1,4 +1,4 @@
-> Ce document contient les livrables issues de la phase d'installation et de configuration de Proxmox VE ainsi que des sous-réseaux au sein du homelab. Ces éléments constituent la base (le core) de notre infrastructure.
+> Ce document contient les livrables issus de la phase d'installation et de configuration de Proxmox VE ainsi que des sous-réseaux au sein du homelab. Ces éléments constituent la base (le core) de notre infrastructure.
 
 ---
 
