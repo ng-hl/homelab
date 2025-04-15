@@ -122,9 +122,15 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
             - [x] Tester le bon fonctionnement avec le déploiement d'un VM de test
             - [x] Convertir en tant que template
     - [ ] Installation du DNS (Bind9)
-        - [ ] Mise en place de l'OS via les templates
-        - [ ] Installation de bind9
+        - [x] Mise en place de l'OS via les templates
+        - [x] Activer la sauvegarde depuis Proxmox
+        - [x] Modifications mineures de l'OS (changement hostname, configuration réseau)
+        - [x] Installation de bind9
         - [ ] Configuration de la zone DNS et du forwarder
+    - [ ] Création de la machine d'administration centrale `admin-core`
+        - [ ] Mise en place de l'OS via les templates
+        - [ ] Activer la sauvegarde depuis Proxmox
+        - [ ] Modifications mineures de l'OS (changement hostname, configuration réseau)
         - [ ] Modification de la configuration du résolveur DNS pour admin-core
         - [ ] Test de la résolution interne depuis admin-core
         - [ ] Test de la résolution externe depuis admin-core
