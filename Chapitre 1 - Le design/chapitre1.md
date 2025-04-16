@@ -72,12 +72,12 @@ Afin de facilité l'administration du homelab et l'utilisation des différents s
 
 # 5. Priorisation
 
-Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services requis, nous allons définir different niveaux de maturité avec les mises en place des différents services qui y sont associées.
+Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des services requis, nous allons définir different niveaux de maturité avec les mises en place des différents services qui y sont associées.
 
 | Niveau     | Description      | Services     | Déploiement
 |---    |:-:    |:-:    |:-:    |
 | 🐟    | Le homelab est fonctionnel, il est possible de déployer des VMs préconfigurées à la main via des templates.      | Firewall, DNS, machine d'administration     | Template de VM sur Proxmox
-| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines.      | Gitlab-ce, Terraform, Ansible     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
+| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place     | Gitlab-ce, Terraform, Ansible, PKI     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
 | 🐳    | La stack d'observabilité est en place et le homepage prêt à l'emploi avec une évolution dynamique.     | Prometheus, Grafana, Homepage       | Image préconfigurée sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD
 
 ---
@@ -154,12 +154,20 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [ ] Modifications mineures de l'OS (changement hostname, configuration réseau)
         - [ ] Installation de Ansible (via pipx)
         - [ ] Configuration de Ansible
-        - [ ] Intégration des hôts déjà existant
+        - [ ] Intégration des hôtes déjà existant
             - [ ] Import de la clé id_ansible (avec l'utilisateur ansible)
             - [ ] Installer le paquet python3
             - [ ] Tester le bon fonctionnement des exécutions Ansible
         - [ ] Convertir les actions manuelles de configurations mineures avec Ansible
         - [ ] Tester le bon fonctionnement
+    - [ ] Mise en place d'une PKI interne
+        - [ ] Mise en place de l'OS via le template
+        - [ ] Configuration de l'OS via Ansible
+        - [ ] Génération de la structure de la PKI (répertoires et fichiers)
+        - [ ] Génération de la clé privée de la CA racine
+        - [ ] Génération du certificat de la CA racine
+        - [ ] Génération de la clé privée de la CA intermédiaire
+        - [ ] Génération du certificat de la CA intermédiaire
     - [ ] Mise en place de Gitlab
         - [ ] Mise en place de l'OS via les templates
         - [ ] Configuration de l'OS via Ansible
@@ -169,4 +177,17 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [ ] Création du groupe core
         - [ ] Création du projet core/ansible et versionné le code existant
         - [ ] Création du projet core/deploy
+    - [ ] Terraform
+        - [ ]
+    - [ ] Append : Coffre fort (Vaultwarden)
+        - [ ] Mise en place de l'OC via les templates
+        - [ ] Configuration de l'OS via Ansible ou manuellement suivant l'exécution de la tâche
+        - [ ] Installation de Vaultwarden
+        - [ ] Configuration de Vaultwarden
+        - [ ] Test d'utilisation
+        - [ ] Stockage des éléments critiques
+            - [ ] PKI
+            - [ ] Clés SSH
+            - [ ] Attribuer des mots de passes uniques (utilisateur ngobert et root et pfSense)
+            - [ ] Intégration avec Gitlab CI
 
