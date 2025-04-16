@@ -40,15 +40,19 @@ Le DNS va nous permettre d'utiliser les noms associées à nos VM plutôt que le
 
 Cette VM sera le point d'entrée vers les ressources du homelab. L'objectif est d'avoir une machine en frontal juste derrière le firewall avec un accés SSH ouvert depuis le WAN (mon réseau local) accessible à certaines IP. Cette machine pourra faire office de rebond et pourra héberger un certains nombre d'outils.
 
-## 2.4. Serveur de versionning
+## 2.4. Serveur Ansible
+
+Le serveur `Ansble` va nous permettre de déployer les configurations des OS que nous déployons. Les actions serons initialisées manuellement dans un premier temps pour nous pourrons intégrer l'outil au sein d'une pipeline via Gitlab plus tard.
+
+## 2.5. Serveur de versionning
 
 Le serveur de versionning permettra la centralisation des différents éléments relatifs à notre infrastructure notammenent concernant l'infrastructure as code avec Terraform et Ansible. De plus, cette VM ouvre la possibilité d'automatiser nos déploiements de VM futures via les runner et les fonctionnalités de la CI/CD. Le choix technique se portera sur la solution `Gitlab-ce`.
 
-## 2.5. Stack d'observabilité
+## 2.6. Stack d'observabilité
 
 L'objectif est de disposer d'outils nous permettant de monitorer et de superviser grâce à la collecte des metriques ainsi qu'à l'alerting. Le choix technique se portera sur la "suite" `Prometheus/Grafana`.
 
-## 2.6. Dashboard central
+## 2.7. Dashboard central
 
 Afin de facilité l'administration du homelab et l'utilisation des différents service, nous allons mettre en place un dashboard moderne et confortable afin d'inventorier l'intégralité des services mis à disposition au sein du homelab. Le choix technique se portera sur `Homepage`
 
@@ -80,9 +84,9 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
 
 # 6. Todo lists
 
-## 🐟
+## 6.1. 🐟
 
-- [ ] Niveau 1
+- [x] Niveau 1
     - [x] Installation de Proxmox VE
     - [x] Configuration de Proxmox VE
         - [x] Création de l'utilisateur d'administration
@@ -138,3 +142,31 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de services
         - [x] Test de la résolution externe depuis admin-core
         - [x] Importer les clés privées SSH utilisées au sein du homelab
         - [x] Modification du FW (accés SSH depuis le WAN uniquement sur cette VM)
+
+---
+
+## 6.2. 🐬 
+
+- [ ] Niveau 2
+    - [ ] Mise en place de Ansible
+        - [ ] Mise en place de l'OS via les templates
+        - [ ] Activer la sauvegarde depuis Proxmox
+        - [ ] Modifications mineures de l'OS (changement hostname, configuration réseau)
+        - [ ] Installation de Ansible (via pipx)
+        - [ ] Configuration de Ansible
+        - [ ] Intégration des hôts déjà existant
+            - [ ] Import de la clé id_ansible (avec l'utilisateur ansible)
+            - [ ] Installer le paquet python3
+            - [ ] Tester le bon fonctionnement des exécutions Ansible
+        - [ ] Convertir les actions manuelles de configurations mineures avec Ansible
+        - [ ] Tester le bon fonctionnement
+    - [ ] Mise en place de Gitlab
+        - [ ] Mise en place de l'OS via les templates
+        - [ ] Configuration de l'OS via Ansible
+        - [ ] Installation de Gitlab CE
+        - [ ] Configuration de base de Gitlab CE
+        - [ ] Création d'un compte administrateur nominatif
+        - [ ] Création du groupe core
+        - [ ] Création du projet core/ansible et versionné le code existant
+        - [ ] Création du projet core/deploy
+
