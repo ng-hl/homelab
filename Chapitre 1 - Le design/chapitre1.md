@@ -78,7 +78,7 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
 |---    |:-:    |:-:    |:-:    |
 | 🐟    | Le homelab est fonctionnel, il est possible de déployer des VMs préconfigurées à la main via des templates.      | Firewall, DNS, machine d'administration     | Template de VM sur Proxmox
 | 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place     | Gitlab-ce, Terraform, Ansible, PKI     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
-| 🐳    | La stack d'observabilité est en place et le homepage prêt à l'emploi avec une évolution dynamique.     | Prometheus, Grafana, Homepage       | Image préconfigurée sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD
+| 🐳    | La stack d'observabilité est en place et le homepage prêt à l'emploi avec une évolution dynamique.     | Prometheus, Grafana, Homepage, notifications (Discord ?)       | Image préconfigurée sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD
 
 ---
 
@@ -149,11 +149,12 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
 
 - [ ] Niveau 2
     - [ ] Mise en place de Ansible
-        - [ ] Mise en place de l'OS via les templates
-        - [ ] Activer la sauvegarde depuis Proxmox
-        - [ ] Modifications mineures de l'OS (changement hostname, configuration réseau)
-        - [ ] Installation de Ansible (via pipx)
-        - [ ] Configuration de Ansible
+        - [x] Mise en place de l'OS via les templates
+        - [x] Activer la sauvegarde depuis Proxmox
+        - [x] Modifications mineures de l'OS (changement hostname, configuration réseau)
+        - [x] Intégration sur admin-core (alias ssh)
+        - [x] Installation de Ansible (via pipx)
+        - [x] Configuration de Ansible
         - [ ] Intégration des hôtes déjà existant
             - [ ] Import de la clé id_ansible (avec l'utilisateur ansible)
             - [ ] Installer le paquet python3
@@ -178,7 +179,11 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
         - [ ] Création du projet core/ansible et versionné le code existant
         - [ ] Création du projet core/deploy
     - [ ] Terraform
-        - [ ]
+        - [ ] Créer le projet core/terraform
+        - [ ] Intégration du provider Proxmox
+        - [ ] Création d'une VM
+        - [ ] Suppression d'une VM
+        - [ ] Récupérer les informations pour avoir un inventaire dynamique
     - [ ] Append : Coffre fort (Vaultwarden)
         - [ ] Mise en place de l'OC via les templates
         - [ ] Configuration de l'OS via Ansible ou manuellement suivant l'exécution de la tâche
@@ -190,4 +195,16 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
             - [ ] Clés SSH
             - [ ] Attribuer des mots de passes uniques (utilisateur ngobert et root et pfSense)
             - [ ] Intégration avec Gitlab CI
+        - [ ] Tests
+    
+---
 
+# 7. Inventaire
+
+| Hostname    | IP      | OS        |  
+| :-:       | :-:       | :-:       |
+| pfsense-core.homelab    | 192.168.100.254    | Debian 12.10 |   
+| dns-core.homelab    | 192.168.100.253    | Debian 12.10 |    
+| admin-core.homelab    | 192.168.100.252    | Debian 12.10 |    
+| pki-core.homelab | 192.168.100.251 | Debian 12.10 |
+| ansible-core.homelab | 192.168.100.250 | Debian 12.10 | 
