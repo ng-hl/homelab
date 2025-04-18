@@ -158,7 +158,7 @@ mkdir -p envs/100-core envs/200-vms
 Création du fichier de configuration `ansible.cfg`
 
 ```bash
-sudo tee /opt/debian/ansible.cfg > /dev/null <<EOF
+sudo tee /opt/ansible/ansible.cfg > /dev/null <<EOF
 [defaults]
 inventory = 100-core/00_inventory.yml
 roles_path = roles
@@ -178,5 +178,59 @@ become_method = sudo
 become_user = root
 EOF
 ```
+
+---
+
+# 5. L'inventaire et les tests
+
+Les premières actions à entreprendre sont, la création de la structure pour l'inventaire et l'initialisation du fichier d'inventaire avec les éléments que l'on a créé jusqu'à présent
+
+``̀`bash
+mkdir /opt/ansible/envs/100-core/group_vars
+mkdir /opt/ansible/envs/100-core/host_vars
+
+#Fichier d'inventaire
+touch /opt/ansible/envs/100-core/00_inventory.yml
+```
+
+Le fichier d'inventaire créé doit être structuré et composé avec les informations concernant nos serveurs actuels. Voici son contenu ci-dessous
+
+```yml
+all:
+  children:
+    debian:
+      hosts:
+        dns-core.homelab:
+          ansible_host: 192.168.100.253
+          hostname: dns-core
+
+        admin-core.homelab:
+          ansible_host: 192.168.100.252
+          hostname: admin-core
+
+        ansible-core.homelab:
+          ansible_host: 192.168.100.250
+          hostname: ansible-core
+
+      vars:
+        ansible_user: ansible
+        ansible_python_interpreter: /usr/bin/python3
+```
+
+On test la communication entre notre serveur ànsible-core` et les managed-nodes via ansible
+
+```bash
+# Commande Anasible avec le module ping
+ansible -i 00_inventory.yml all -m ping --one-line
+
+# Retour
+ansible-core.homelab | SUCCESS => {"changed": false,"ping": "pong"}
+admin-core.homelab | SUCCESS => {"changed": false,"ping": "pong"}
+dns-core.homelab | SUCCESS => {"changed": false,"ping": "pong"}
+```
+
+---
+
+# 6. Premier rôles et playbook (installation de tmux)
 
 
