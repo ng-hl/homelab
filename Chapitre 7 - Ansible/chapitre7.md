@@ -181,11 +181,11 @@ EOF
 
 ---
 
-# 5. L'inventaire et les tests
+# 5. L'inventaire et les tests
 
 Les premières actions à entreprendre sont, la création de la structure pour l'inventaire et l'initialisation du fichier d'inventaire avec les éléments que l'on a créé jusqu'à présent
 
-``̀`bash
+```bash
 mkdir /opt/ansible/envs/100-core/group_vars
 mkdir /opt/ansible/envs/100-core/host_vars
 
@@ -232,5 +232,126 @@ dns-core.homelab | SUCCESS => {"changed": false,"ping": "pong"}
 ---
 
 # 6. Premier rôles et playbook (installation de tmux)
+
+Nous commençons par finaliser la structure du projet Ansible pour arriver à celle-ci
+
+```bash
+├── ansible.cfg
+├── envs
+│   ├── 100-core
+│   │   ├── 00_inventory.yml
+│   │   ├── group_vars
+│   │   └── host_vars
+│   └── 200-vms
+├── playbooks
+│   ├── playbook1
+│   └── playbookX
+└── roles
+    ├── role1
+    └── roleX
+```
+
+Nous créons les répertoires `playbooks`et `roles`. Puis nous allons initier deux roles avec la commande `ansible-galaxy`. Le premier role aura pour objectif d'installer les paquets de base et le second role va modifier le motd pour avoir des éléments utiles plus rapidement à disposition.
+
+```bash
+# Création des répertoires playbooks et roles
+mkdir playbooks
+mkdir roles
+
+# Initialisation des roles avec ansible-galaxy
+ansible-galaxy init roles/base_packages
+ansible-galaxy init roles/motd
+```
+
+Dans un premier temps, nous nous concentrons sur le role `base_packages`. Nous éditons le fichier `roles/base_packages/tasks/main.yml
+
+```yaml
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/base_packages
+# Rôle permettant l'installation des paquets de base
+
+- name: Mise à jour du cache apt
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Installation des paquets de base
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - tmux
+      - htop
+      - jq
+      - tree
+      - git
+      - figlet
+    state: present
+```
+
+Concernant le role `motd`, nous créons le fichier `roles/motd/templates/motd.j2`. Ce fichier au format jinja2 va nous permettre d'appliquer les variables utiles pour la formations du fichier que nous allons délivrer avec ce role.
+
+```jinja2
+########################################################
+#   Hostname     : {{ ansible_hostname }}
+#   IP Address   : {{ ansible_default_ipv4.address }}
+#   Network Zone : {{ 'core' if 'core' in inventory_hostname else 'vms' if 'vms' in inventory_hostname else 'unknown' }}
+#   Uptime       : {{ (ansible_uptime_seconds / 60) | int }} minutes
+#   Disk Usage   : {{ ansible_mounts[0].size_available | human_readable }}/{{ ansible_mounts[0].size_total | human_readable }}
+########################################################
+```
+
+Nous éditons le fichier `roles/motd/tasks/main.yml` avec les éléments ci-dessous
+
+```yaml
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/motd
+# Rôle permettant la modification du motd
+
+- name: Déploiement du motd
+  ansible.builtin.template:
+    src: motd.j2
+    dest: /etc/motd
+    mode: '0644'
+```
+
+Pour finir, nous créons le playbook qui va permettre d'exécuter ces deux roles. On créer le fichier `playbooks/00_config_vm.yml` avec les éléments ci-dessous
+
+```yaml
+- name: Configuration de base d'une VM
+  hosts: all
+  become: true
+  roles:
+    - base_packages
+    - motd
+```
+
+Enfin, pour que l'exécution du playbook se déroule correctement, il est primordial d'ajouter l'utilisateur `ansible` parmis les utilisateur pouvant élever ses privilèges en tant que superadministrateur sans avoir une demande de mot de passe. Pour cela, il faut créer le fichier `/etc/sudoers.d/ansible` et y ajouter ce contenu
+
+```bash
+ansible ALL=(ALL) NOPASSWD: ALL
+```
+
+Nous pouvons faire une première exécution avec l'option `check`. Celle-ci nous permet d'exécuter le playbook en mode dry-run
+
+```bash
+ansible-playbook -i envs/100-core/00_inventory.yml playbooks/00_config_vm.yml --check
+```
+
+Tout semble être opérationnel pour lancer l'exécution
+
+![alt text](ansible_check.png)
+
+On exécute le playbook
+
+```bash
+ansible-playbook -i envs/100-core/00_inventory.yml playbooks/00_config_vm.yml
+```
+
+![alt text](ansible_exec_playbook.png)
+
+
 
 

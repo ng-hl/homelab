@@ -155,10 +155,9 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
         - [x] Intégration sur admin-core (alias ssh)
         - [x] Installation de Ansible (via pipx)
         - [x] Configuration de Ansible
-        - [ ] Intégration des hôtes déjà existant
-            - [ ] Import de la clé id_ansible (avec l'utilisateur ansible)
-            - [ ] Installer le paquet python3
-            - [ ] Tester le bon fonctionnement des exécutions Ansible
+        - [x] Intégration des hôtes déjà existant
+            - [x] Installer le paquet python3
+            - [x] Tester le bon fonctionnement des exécutions Ansible
         - [ ] Convertir les actions manuelles de configurations mineures avec Ansible
         - [ ] Tester le bon fonctionnement
     - [ ] Mise en place d'une PKI interne
