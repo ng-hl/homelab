@@ -77,7 +77,7 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
 | Niveau     | Description      | Services     | Déploiement
 |---    |:-:    |:-:    |:-:    |
 | 🐟    | Le homelab est fonctionnel, il est possible de déployer des VMs préconfigurées à la main via des templates.      | Firewall, DNS, machine d'administration     | Template de VM sur Proxmox
-| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place     | Gitlab-ce, Terraform, Ansible, PKI     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
+| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place et une acme    | Gitlab-ce, Terraform, Ansible, PKI, acme     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
 | 🐳    | La stack d'observabilité est en place et le homepage prêt à l'emploi avec une évolution dynamique.     | Prometheus, Grafana, Homepage, notifications (Discord ?)       | Image préconfigurée sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD
 
 ---
@@ -183,6 +183,10 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
         - [ ] Création d'une VM
         - [ ] Suppression d'une VM
         - [ ] Récupérer les informations pour avoir un inventaire dynamique
+    - [ ] Nom de domaine
+        - [ ] Réserver un nom de domaine (CloudFlare, Duck DNS, ...)
+        - [ ] Générer le certificat wildcard *.ng-hl.com avec acme.sh
+        - [ ] Gérer le renouvellement automatique avec acme.sh
     - [ ] Append : Coffre fort (Vaultwarden)
         - [ ] Mise en place de l'OC via les templates
         - [ ] Configuration de l'OS via Ansible ou manuellement suivant l'exécution de la tâche
@@ -195,6 +199,7 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
             - [ ] Attribuer des mots de passes uniques (utilisateur ngobert et root et pfSense)
             - [ ] Intégration avec Gitlab CI
         - [ ] Tests
+        - [ ] Récupération du certificat TLS renouvellé
     
 ---
 
@@ -206,4 +211,9 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
 | dns-core.homelab    | 192.168.100.253    | Debian 12.10 |    
 | admin-core.homelab    | 192.168.100.252    | Debian 12.10 |    
 | pki-core.homelab | 192.168.100.251 | Debian 12.10 |
-| ansible-core.homelab | 192.168.100.250 | Debian 12.10 | 
+| ansible-core.homelab | 192.168.100.250 | Debian 12.10 |
+| acme-core.homelab | 192.168.100.248 | Debian 12.10 |
+
+| Hostname    | IP      | OS        |  
+| :-:       | :-:       | :-:       |
+| vaultwarden-core.ng-hl.com    | 192.168.100.249 | Debian 12.10 |
