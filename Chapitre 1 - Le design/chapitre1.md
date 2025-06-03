@@ -202,8 +202,14 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
             - [ ] Clés SSH
             - [ ] Attribuer des mots de passes uniques (utilisateur ngobert et root et pfSense)
             - [ ] Intégration avec Gitlab CI
-        - [ ] Tests
-        - [ ] Récupération du certificat TLS renouvellé
+        - [x] Tests
+    - [x] Certificat wildcard *.ng-hl.com
+        - [x] Réservation du nom de domaine
+        - [x] Création du certification
+        - [x] Automatisation du renouvellement du certificat
+            - [x] Configuration de acme + test de renouvellement forcé
+            - [x] Script de déploiement du nouveau certificat (indexé sur la liste des services exposés)
+            - [x] Test de bout en bout
     
 ---
 

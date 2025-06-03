@@ -127,6 +127,7 @@ On initie les variables d'environnement nécessaires concernant les informations
 ```bash
 export CF_Token="XXX"
 export CF_Account_ID="XXX"
+export ACME_CA="https://acme-v02.api.letsencrypt.org/directory"
 ```
 
 ---
@@ -145,6 +146,14 @@ acme.sh --register-account -m <mail>
 
 Pour rappel, nous allons générer un certificat wildcard utilisable pour l'ensemble de nos services hébergés sur le homelab.
 
+On créé l'aborescence nécessaire pour stocker proprement les éléments du certificat
+
+```bash
+mkdir -p /etc/ssl/certs/wildcard.ng-hl.com
+mkdir -p /etc/ssl/private/wildcard.ng-hl.com
+chmod 700 /etc/ssl/private/wildcard.ng-hl.com
+```
+
 On spécifie que l'on souhaite utiliser Let's Encrypt
 
 ```bash
@@ -154,5 +163,157 @@ acme.sh --set-default-ca --server letsencrypt
 On génère le certificat wildcard
 
 ```bash
-acme.sh --issue --dns dns_cf -d *.ng-hl.com --keylength ec-256
+acme.sh --issue --dns dns_cf -d *.ng-hl.com --keylength ec-256 --server letsencrypt
+```
+
+On installe le certificat sur le système avec les noms des éléments correspondants
+
+```bash
+acme.sh --install-cert -d '*.ng-hl.com' \
+  --cert-file /etc/ssl/certs/wildcard.ng-hl.com/fullchain.cer \
+  --key-file /etc/ssl/private/wildcard.ng-hl.com/privkey.key \
+  --ca-file /etc/ssl/certs/wildcard.ng-hl.com/ca.cer \
+  --fullchain-file /etc/ssl/certs/wildcard.ng-hl.com/fullchain.pem
+```
+
+---
+
+# 7. Renouvellement automatique
+
+Pour commencer, on génère une paire de clé SSH spécifique pour l'utilisateur root de `acme-core`
+
+> Les commandes ci-dessous sont exécutées en tant que root
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_acme -C "Utilisateur root acme"
+```
+
+On téléverse la clé publique pour l'utilisateur d'administration `ngobert` sur le serveur `vaultwarden-core.homelab`
+
+```bash
+ssh-copy-id -i ~/.ssh/id_acme.pub ngobert@vaultwarden-core.homelab
+```
+
+Enfin, on édite le fichier `~/.ssh/config`
+
+```bash
+Host vaultwarden-core.homelab
+  User root
+  IdentityFile ~/.ssh/id_acme
+```
+
+On test le bon fonctionnement de la connexion SSH
+
+```bash
+ssh ngobert@vaultwarden-core.homelab
+```
+
+A présent, nous allons automatiser le déploiement sur les VM hébergeant un applicatif exposé avec le certificat.
+
+```bash
+mkdir -p /root/acme-deploy
+touch /root/acme-deploy/targets.yml
+```
+
+Contenu du fichier `/root/acme-deploy/targets.yml. Ici on anticipe le fait que la reload_cmd peut être différente car en plus du nom du service, ce n'est pas assurer que les futurs applicatifs tournent sous Docker.
+
+```yaml
+targets:
+  - host: vaultwarden-core.homelab
+    user: ngobert
+    type: docker
+    cert_path: /opt/vaultwarden/ssl/
+    reload_cmd: docker restart vaultwarden
+```
+
+On créé le script de vérification et de déploiement `/root/acme-deploy/acme-deploy.sh` (le paquet `yq` doit être installé sur la VM : `sudo apt install -y yq`)
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+CONFIG_FILE="/root/acme-deploy/targets.yml"
+LOCAL_CERT="/etc/ssl/certs/wildcard.ng-hl.com/fullchain.cer"
+LOCAL_KEY="/etc/ssl/private/wildcard.ng-hl.com/privkey.key"
+LOCAL_CA="/etc/ssl/certs/wildcard.ng-hl.com/ca.cer"
+LOCAL_FULLCHAIN="/etc/ssl/certs/wildcard.ng-hl.com/fullchain.pem"
+
+# Installation du certificat
+acme.sh --install-cert -d '*.ng-hl.com' \
+  --cert-file "$LOCAL_FULLCHAIN" \
+  --key-file "$LOCAL_KEY" \
+  --ca-file "$LOCAL_CA" \
+  --fullchain-file "$LOCAL_CERT"
+
+nb_targets=$(yq '.targets | length' "$CONFIG_FILE")
+
+for index in $(seq 0 $((nb_targets - 1))); do
+  HOST=$(yq -r ".targets[$index].host" "$CONFIG_FILE")
+  USER=$(yq -r ".targets[$index].user" "$CONFIG_FILE")
+  DEST_PATH=$(yq -r ".targets[$index].cert_path" "$CONFIG_FILE" | sed 's|/$||')
+  RELOAD_CMD=$(yq -r ".targets[$index].reload_cmd" "$CONFIG_FILE")
+
+  echo "Syncing cert to $HOST..."
+
+  # Calcul checksums locaux
+  LOCAL_SUM_CERT=$(sha256sum "$LOCAL_CERT" | awk '{print $1}')
+  LOCAL_SUM_KEY=$(sha256sum "$LOCAL_KEY" | awk '{print $1}')
+
+  # Calcul checksums distants (on capture erreurs en cas de fichier absent)
+  REMOTE_SUM_CERT=$(ssh "${USER}@${HOST}" "sha256sum '$DEST_PATH/fullchain.cer' 2>/dev/null || echo 'missing'" | awk '{print $1}')
+  REMOTE_SUM_KEY=$(ssh "${USER}@${HOST}" "sha256sum '$DEST_PATH/privkey.key' 2>/dev/null || echo 'missing'" | awk '{print $1}')
+
+  echo "Local cert checksum:  $LOCAL_SUM_CERT"
+  echo "Remote cert checksum: $REMOTE_SUM_CERT"
+  echo "Local key checksum:   $LOCAL_SUM_KEY"
+  echo "Remote key checksum:  $REMOTE_SUM_KEY"
+
+  if [[ "$LOCAL_SUM_CERT" != "$REMOTE_SUM_CERT" || "$LOCAL_SUM_KEY" != "$REMOTE_SUM_KEY" ]]; then
+    echo "Changes detected, copying certs..."
+
+    scp "$LOCAL_CERT" "${USER}@${HOST}:$DEST_PATH/fullchain.cer"
+    scp "$LOCAL_KEY" "${USER}@${HOST}:$DEST_PATH/privkey.key"
+
+    echo "Reloading service on $HOST..."
+    ssh "${USER}@${HOST}" "$RELOAD_CMD"
+
+    echo "Deployment completed for $HOST."
+  else
+    echo "Certificate already up to date on $HOST."
+  fi
+
+  echo "----------------------------------------"
+done
+```
+
+On rend le script exécutable
+
+```bash
+chmod +x /root/acme-deploy/acme-deploy.sh
+```
+
+Enfin, on créé le fichier de log et le crontab correspondant
+
+```bash
+touch /var/log/acme-deploy.sh
+```
+
+```bash
+30 14 * * * /root/acme-deploy/acme-deploy.sh >> /var/log/acme-deploy.log 2>&1
+```
+
+---
+
+# 8. Test
+
+On force le renouvellement du certificat
+
+```bash
+acme.sh --renew -d '*.ng-hl.com' --force
+```
+
+Enfin, on simule l'exécution du cron précédemment créé avec le script `acme-deploy.sh`
+
+```bash
+/root/acme-deploy/acme-deploy.sh >> /var/log/acme-deploy.log 2>&1
 ```
