@@ -42,10 +42,10 @@ Enfin, nous devons recharger la configuration courante.
 sudo sysctl -p
 ```
 
-A présent, nous changons le hostname de la VM pour que ce soit `vaultwarden-core.ng-hl.com`, puis nous modifions le contenu de son résolveur DNS local `/etc/hosts`
+A présent, nous changons le hostname de la VM pour que ce soit `vaultwarden-core.homelab`, puis nous modifions le contenu de son résolveur DNS local `/etc/hosts`
 
 ```bash
-sudo hostnamectl set-hostname vaultwarden-core.ng-hl.com
+sudo hostnamectl set-hostname vaultwarden-core.homelab
 ```
 
 Nous allons maintenant modifier la configuration du résolveur DNS de la machine.
@@ -75,7 +75,7 @@ sudo rm /etc/resolv.conf
 sudo ln -s /run/systemd/resolve/stub-resolv.conf  /etc/resolv.conf
 ```
 
-A présent, on peut tester que les résolutions DNS des noms de domaine interne `.homelab` ainsi que les noms de domaines externes fonctionnent correctement en passant par notre serveur DNS `dns-core.homelab` accessible via l'IP `192.168.100.253`
+A présent, on peut tester que les résolutions DNS des noms de domaine interne `.homelab`, `.ng-hl.com` ainsi que les noms de domaines externes fonctionnent correctement en passant par notre serveur DNS `dns-core.homelab` accessible via l'IP `192.168.100.253`
 
 ```bash
 resolvectl status
@@ -107,3 +107,75 @@ dig +short google.com
 
 # 3. Installation de VaultWarden
 
+> Il est nécessaire d'installer Docker Engine en amont puis on ajoute l'utilisateur `ngobert` au groupe `docker`
+
+On créé la structure de répertoire pour hébergé le service vaultwarden ainsi que le certificat wildcard
+
+```bash
+mkdir -p /opt/vaulwarden/ssl
+```
+
+Pour téléverser les éléments du certificat depuis acme-core, on utilise rsync
+
+```bash
+sudo rsync -avz /root/.acme.sh/*.ng-hl.com_ecc/{fullchain.cer,*.ng-hl.com.key}   ngobert@vaultwarden-core.homelab:/opt/vaultwarden/ssl/
+```
+
+On renomme la clé privée du certificat pour plus de simplicité d'utilisation
+
+```bash
+mv \*.ng-hl.com.key privkey.key 
+```
+
+On créé le volumes Docker
+
+```bash
+docker volume create vaultwarden-volume
+```
+
+On exécute le container Docker avec la dernière version de l'image vaultwarden, les variables d'environnement et les volumes nécessaires
+
+```bash
+docker run --detach --name vaultwarden \
+  --env DOMAIN="https://vaultwarden-core.ng-hl.com" \
+  --env ROCKET_TLS='{certs="/ssl/fullchain.cer",key="/ssl/privkey.key"}' \
+  --env ROCKET_PORT=443 \
+  --volume vaultwarden-volume:/data \
+  --volume /opt/vaultwarden/ssl/:/ssl:ro \
+  --restart unless-stopped \
+  --publish 443:443 \
+  vaultwarden/server:latest
+```
+
+Activation de l'interface d'administration
+
+```bash
+# Création du token
+openssl rand -hex 32
+
+# Exécution du container
+docker run --detach --name vaultwarden \
+  --env DOMAIN="https://vaultwarden-core.ng-hl.com" \
+  --env ROCKET_TLS='{certs="/ssl/fullchain.cer",key="/ssl/privkey.key"}' \
+  --env ROCKET_PORT=443 \
+  --env ADMIN_TOKEN="XXXXX" \
+  --volume vaultwarden-volume:/data \
+  --volume /opt/vaultwarden/ssl/:/ssl:ro \
+  --restart unless-stopped \
+  --publish 443:443 \
+  vaultwarden/server:latest
+```
+
+---
+
+# 4. Exposition du service sur le réseau local
+
+Pour rendre le service `vaultwarden` sur le réseau local, il est nécessaire d'ouvrir le flux à destination de cette VM sur le port 443 et du serveur DNS du homelab sur UDP/53 et TCP/53. De plus, il est nécessaire d'ajouter un route statique en passant par 192.168.1.49 (le pfsense) pour joindre le réseau 192.168.100.0/24.
+
+---
+
+# 5. Accés au service
+
+Pour se connecter au service VaultWarden : `https://vaultwarden-core.ng-hl.com` ou `https://vaultwarden.ng-hl.com` (CNAME associé)
+
+Pour se connecter à l'interface d'administration : `https://vaultwarden-core.ng-hl.com/admin` (utiliser le token précédemment créé)

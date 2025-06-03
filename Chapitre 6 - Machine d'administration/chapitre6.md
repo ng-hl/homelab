@@ -131,8 +131,10 @@ total 12
 
 Afin de rendre les connexions plus confortables, nous allons éditer notre fichier de configuration SSH `~/.ssh/config` avec les éléments ci-dessous (utilisation de la bonne clé SSH dès que l'on souhaite se connecter sur une VM avec le hostname dans le domaine homelab avec l'utilisateur ngobert)
 
+> Le nom de domaine `ng-hl.com` est ajouté au chapitre 9. L'objectif est de disposer d'un certificat wildcard associé à ce nom de domaine pour accéder à mes services exposés avec un certificat valide garanti par les CA.
+
 ```bash
-Host *.homelab
+Host *.homelab *.ng-hl.com
   User ngobert
   IdentityFile ~/.ssh/id_admin
 ```
