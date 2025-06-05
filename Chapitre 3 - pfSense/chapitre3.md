@@ -26,4 +26,8 @@ Afin de rendre l'interface webgui de pfSense accessible depuis le WAN, il est n�
 
 ![alt text](webgui-rule.png)
 
+# 3. Application du HTTPS
+
+Une fois le chapitre 9 réalisé avec la création du certificat wildcard *.ng-hl.com, nous passons l'accés à l'interface web de pfSense via HTTPS uniquement. Tout est réalisable via l'interface web pour importer le certificat. Il est nécessaire également de modifier le nom du hostname pfsense en `pfsense.ng-hl.com` et d'ajouter cette entrée dans la zone DNS adéquate au niveau du serveur `dns-core`. (S'assurer qu'une sauvegarde de pfSense est disponible est fonctionnelle au niveau de Proxmox VE afin de faire un rollback facilement en cas de problème).
+
 
