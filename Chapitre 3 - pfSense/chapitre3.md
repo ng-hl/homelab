@@ -35,3 +35,4 @@ Afin de rendre l'interface webgui de pfSense accessible depuis le WAN, il est n√
 | Date     | Description    | 
 |:-:    |:-:    |
 | 04/06/2025     | Initialisation du tableau. Etat du homelab au chapitre 10, "Le coffre fort" |
+

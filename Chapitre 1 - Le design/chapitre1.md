@@ -104,8 +104,6 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de service 
         - [x] Configurer la VM avec trois interfaces (vmbr0, vmbr1 et vmbr2)
         - [x] Installer l'OS via l'ISO
         - [x] Rendre disponible l'interface d'administration depuis le WAN (réseau local)
-        - [x] Accés en HTTPS avec le certificat wildcard ng-hl.com (à partir du niveau 2 - Chapitre 9)
-        - [ ] Renouvellement automatique via acme (à partir du niveau 2 - Chapitre 9)
     - [x] Créer un template de Debian 12
         - [x] Importer l'ISO de Debian 12
         - [x] Installer l'OS avec les éléments suivants
@@ -218,8 +216,6 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de service 
 
 # 7. Inventaire
 
-# 7.2 Inventaire core
-
 | Hostname    | IP      | OS        | Hostname exposé
 | :-:       | :-:       | :-:       | :-:       |
 | pfsense-core.homelab    | 192.168.100.254    | Debian 12.10 |   
@@ -229,9 +225,3 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de service 
 | ansible-core.homelab | 192.168.100.250 | Debian 12.10 |
 | acme-core.homelab | 192.168.100.248 | Debian 12.10 |
 | vaultwarden-core.homelab   | 192.168.100.249 | Debian 12.10 | vaultwarden-core.ng-hl.com vaultwarden.ng-hl.com (CNAME) |
-
-## 7.2. Inventaire vms
-
-| Hostname    | IP      | OS        | Hostname exposé
-| :-:       | :-:       | :-:       | :-:       |
-| kresus-vms.homelab    | 192.168.200.4    | Debian 12.10 | kresus-vms.ng-hl.com kresus.ng-hl.com (CNAME) |

@@ -1,4 +1,4 @@
-> Ce document contient les livrables issus de la phase d'installation et de configuration du service DNS avec `bind9`. L'objectif est de pouvoir disposer d'un service DNS concernant notre zone .homelab. accessible au sein du homelab et depuis mon réseau local.
+> Ce document contient les livrables issus de la phase d'installation et de configuration du service DNS avec `bind9`. L'objectif est de pouvoir disposer d'un service DNS concernant notre zone .homelab. accessible au sein du homelab et depuis mon réseau local. Ce serveur portera également la zone DNS `ng-hl.com` à partir du chapitre 9.
 
 ---
 
@@ -71,8 +71,8 @@ forwarders {
     192.168.200.254;
 }
 
+# Ajout de la récursivité des requêtes (principalement pour le sous-réseau 192.168.200.0/24)
 ...
-
 allow-recursion { 127.0.0.1; 192.168.100.0/24; 192.168.200.0/24; };
 ```
 
@@ -146,13 +146,13 @@ zone 100.168.192.in-addr.arpa/IN: loaded serial 2504151
 OK
 ```
 
-Une fois que la syntaxe de fichier de configuration des zones bind précédemment éditer est correcte, nous pouvons recharger le daemon `bind9` pour appliquer les modifications.
+Une fois que la syntaxe des fichiers de configuration des zones bind précédemment édités est correcte, nous pouvons recharger le daemon `bind9` pour appliquer les modifications.
 
 ```bash
 sudo systemctl reload bind9
 ```
 
-On peut également vérifier que le service est bel et bien exécuter
+On peut également vérifier que le service est bel et bien fonctionnel.
 
 ```bash
 sudo systemctl status bind9
@@ -164,7 +164,7 @@ sudo systemctl status bind9
 
 # 5. Vérification
 
-Pour le moment, nous ne disposons que d'une seule VM, `dns-core`. Cependant, nous pouvons vérifier directement sur ce noeud que le service DNS répond correctement avec les enregistrements DNS que nous avons ajoutés au niveau des fichiers de configuration pour la zone `.homelab` que ce soit pour la recherche DNS directe ou inverse.
+Pour le moment, nous ne disposons que d'une seule VM, `dns-core`. Cependant, nous pouvons vérifier directement sur ce noeud que le service DNS répond correctement avec les enregistrements DNS que nous avons ajoutés au niveau des fichiers de configurations pour la zone `.homelab` que ce soit pour la recherche DNS directe ou inverse.
 
 ```bash
 # Test résolution DNS
