@@ -1,16 +1,17 @@
-> Ce document contient les livrables issus de la phase de design du homelab. On doit se poser les bonnes questions pour répondre efficacement au besoin de départ, à savoir, disposer d'un environnement où l'on peut déployer rapidement des serveurs prêt à l'emploi pour divers cas d'usage.
+> Ce document contient les livrables issus de la phase de design du homelab. On doit se poser les bonnes questions pour répondre efficacement au besoin de départ, à savoir, disposer d'un environnement où l'on peut déployer rapidement des serveurs prêt à l'emploi pour divers cas d'usage. La conception est susceptible de changée au fur et à mesure des travaux, cette page est donc susceptible d'évoluer (mise à jour de l'inventaire, ajout de services/fonctionnalités, ...)
 
 ---
 
 # 1. Le hardware
 
-<> Cette section est susceptible d'évoluer avec le temps. Des évolutions peuvent être appliquées au fur et à mesure du temps avec l'acquisition de plus de compute pour améliorer les performances et la résilience ainsi que la mise en place d'un système de stockage plus adapté comme un NAS.
+> Cette section est susceptible d'évoluer avec le temps. Des évolutions peuvent être appliquées avec l'acquisition de plus de compute pour améliorer les performances et la résilience ainsi que la mise en place d'un système de stockage plus adapté comme un NAS.
 
-Pour mettre en place ce homelab, il nous faut un appareil qui dispose de suffisemment de compute soit au moins 32Go de RAM et 16vCPU ainsi qu'un minimum d'espace disque soit 1To. De plus, cet machine va être disponible tout le temps 24h/24 7j/7, il est donc important de prendre une solution qui ne compose pas trop d'énergie.
+Pour mettre en place ce homelab, il nous faut un appareil qui dispose de suffisemment de compute soit au moins 32Go de RAM et 16vCPU ainsi qu'un minimum d'espace disque soit 1To. De plus, cette machine va être disponible tout le temps 24h/24 7j/7, il est donc important de prendre une solution qui ne comsome pas trop d'énergie.
 
 | Date      | Compute      | Stockage      | Niveau de maturité      |
 |:-:    |:-:    |:-:    |:-:    |
 | 11/04/2025      | 1 node - E3B Mini PC (32Go RAM, 16 vCPU, 512Go SSD)     | 1 node - E3B Mini PC (512Go SSD)     | 1 🐟      |
+
 ---
 
 # 1. Les environnements
@@ -19,8 +20,8 @@ Le homelab va être divisé en deux sous-réseaux principaux. Le premier ayant p
 
 | Nom      | Description      | Adressage      |
 |:-:    |---    |---    |
-| Core      | Environnement de base du homelab      | 192.168.100.0/24      |
-| VMS      | Environnement de déploiement des VMs      | 192.168.200.0/24      |
+| Core      | Environnement de base du homelab (prod)      | 192.168.100.0/24      |
+| VMS      | Environnement de déploiement des VMs (sandbox)     | 192.168.200.0/24      |
 
 ---
 
@@ -30,19 +31,19 @@ Pour disposer d'un environnement fonctionnel et confortable, nous avons besoin d
 
 ## 2.1. Firewall
 
-Il s'agit de la seul VM qui aura une interface réseau directement sur mon réseau local (infine le WAN d'un point de vue Firewall) et de ce fait obtiendra une IP en 192.168.1.0/24. L'objectif est gérer les autorisations concernant les communications entrantes et sortantes au niveau du homelab. Le choix technique se portera sur la solution `PFSense`.
+Il s'agit de la seul VM qui aura une interface réseau directement sur mon réseau local (interface WAN d'un point de vue Firewall) et de ce fait, obtiendra une IP en 192.168.1.0/24. L'objectif est de gérer les autorisations concernant les communications entrantes et sortantes au niveau du homelab. Le choix technique se portera sur la solution `pfSense`.
 
 ## 2.2. Serveur DNS
 
-Le DNS va nous permettre d'utiliser les noms associées à nos VM plutôt que les IP. Le choix technique se portera sur la solution `bind9`.
+Le DNS va nous permettre d'utiliser les noms associés à nos VM plutôt que les IP avec deux zones DNS `.homelab` (DNS interne du homelab) aisni que `ng-hl.com` (le domaine qui portera les services exposés sur mon réseau local). Le choix technique se portera sur la solution `bind9`. 
 
 ## 2.3. Machine d'administration centrale
 
 Cette VM sera le point d'entrée vers les ressources du homelab. L'objectif est d'avoir une machine en frontal juste derrière le firewall avec un accés SSH ouvert depuis le WAN (mon réseau local) accessible à certaines IP. Cette machine pourra faire office de rebond et pourra héberger un certains nombre d'outils.
 
-## 2.4. Serveur Ansible
+## 2.4. Serveur de gestion des configuration
 
-Le serveur `Ansble` va nous permettre de déployer les configurations des OS que nous déployons. Les actions serons initialisées manuellement dans un premier temps pour nous pourrons intégrer l'outil au sein d'une pipeline via Gitlab plus tard.
+Ce service va nous permettre de déployer les configurations des OS que nous déployons. Les actions serons initialisées manuellement dans un premier temps puis nous pourrons intégrer l'outil au sein d'une pipeline via Gitlab-CI plus tard. Le choix technique se portera sur la solution `Ansible`.
 
 ## 2.5. Coffre fort numérique
 
@@ -50,11 +51,11 @@ Le coffre fort numérique va nous permettre de stocker divers mots de passe et s
 
 ## 2.6. Serveur de versionning
 
-Le serveur de versionning permettra la centralisation des différents éléments relatifs à notre infrastructure notammenent concernant l'infrastructure as code avec Terraform et Ansible. De plus, cette VM ouvre la possibilité d'automatiser nos déploiements de VM futures via les runner et les fonctionnalités de la CI/CD. Le choix technique se portera sur la solution `Gitlab-ce`.
+Le serveur de versionning permettra la centralisation des différents éléments relatifs à notre infrastructure notammenent concernant l'infrastructure as code avec Terraform et Ansible. De plus, cette VM ouvre la possibilité d'automatiser nos déploiements futurs de VM via les runners et les fonctionnalités de la CI/CD. Le choix technique se portera sur la solution `Gitlab-ce`.
 
 ## 2.7. Stack d'observabilité
 
-L'objectif est de disposer d'outils nous permettant de monitorer et de superviser grâce à la collecte des metriques ainsi qu'à l'alerting. Le choix technique se portera sur la "suite" `Prometheus/Grafana`.
+L'objectif est de disposer d'outils nous permettant de monitorer et de superviser les OS et les services grâce à la collecte des metriques ainsi qu'à l'alerting. Le choix technique se portera sur la "suite" `Prometheus/Grafana`.
 
 ## 2.8. Dashboard central
 
@@ -64,24 +65,24 @@ Afin de facilité l'administration du homelab et l'utilisation des différents s
 
 # 3. Schéma réseau physique
 
-![alt text](schema_physique.png)
+![Schéma physique](schema_physique.png)
 
 ---
 
 # 4. Schéma réseau logique
 
-![alt text](schema_logique.png)
+![Schéma logique](schema_logique.png)
 
 ---
 
 # 5. Priorisation
 
-Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des services requis, nous allons définir different niveaux de maturité avec les mises en place des différents services qui y sont associées.
+Afin de disposer rapidement d'un homelab fonctionnel avec le minimum de service requis, nous allons définir differents niveaux de maturité avec les mises en place des différents services qui y sont associées.
 
 | Niveau     | Description      | Services     | Déploiement
 |---    |:-:    |:-:    |:-:    |
 | 🐟    | Le homelab est fonctionnel, il est possible de déployer des VMs préconfigurées à la main via des templates.      | Firewall, DNS, machine d'administration     | Template de VM sur Proxmox
-| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place et une acme    | Gitlab-ce, Terraform, Ansible, PKI, acme     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
+| 🐬     | Le déploiement des VM est uniforme et automatisé. La machine de rebond centralisée peut communiquer avec l'entièreté des machines. Une PKI est en place ainsi que le nom de domaine ng-hl.com et une acme    | Gitlab-ce, Terraform, Ansible, PKI, certificat wildcard, acme     | Template de VM sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD 
 | 🐳    | La stack d'observabilité est en place et le homepage prêt à l'emploi avec une évolution dynamique.     | Prometheus, Grafana, Homepage, notifications (Discord ?)       | Image préconfigurée sur Proxmox avec Terraform et Ansible dans une pipeline Gitlab CI/CD
 
 ---
@@ -199,7 +200,7 @@ Afin de disposer rapidement d'un homelab fonctionnel avec le minimum des service
         - [x] Test d'utilisation
         - [ ] Stockage des éléments critiques
             - [ ] PKI
-            - [ ] Clés SSH
+            - [x] Clés SSH
             - [ ] Attribuer des mots de passes uniques (utilisateur ngobert et root et pfSense)
             - [ ] Intégration avec Gitlab CI
         - [x] Tests
