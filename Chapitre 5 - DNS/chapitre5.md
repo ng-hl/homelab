@@ -62,13 +62,18 @@ sudo apt install -y bind9 bind9-doc
 
 # 4. Configuration de bind9
 
-La première chose que nous allons faire est de configurer le forwarder vers notre `pfSense` en `192.168.100.254`. Ainsi, lorsque nous souhaiterons faire une requête DNS qui n'est pas couverte par notre serveur bind9 la requête sera forwarder vers pfSense qui lui même va renvoyer la requête sur ma box internet sur mon réseau local. Mes VM auront pourrons donc résoudre les noms de domaine d'Internet, non déclarés sur mon bind9. Pour cela, nous éditons le fichier `/etc/bind9/named.conf.options`
+La première chose que nous allons faire est de configurer le forwarder vers notre `pfSense` en `192.168.100.254` pour le réseau `core` et `192.168.200.254` pour le réseau `vms`. Ainsi, lorsque nous souhaiterons faire une requête DNS qui n'est pas couverte par notre serveur bind9 la requête sera forwarder vers pfSense qui lui même va renvoyer la requête sur ma box internet sur mon réseau local. Mes VM auront pourrons donc résoudre les noms de domaine d'Internet, non déclarés sur mon bind9. Pour cela, nous éditons le fichier `/etc/bind9/named.conf.options`
 
 ```bash
-# On décommente les lignes concernant le forwarder puis on rensigne l'IP désirée
+# On décommente les lignes concernant le forwarder puis on renseigne l'IP désirée
 forwarders {
     192.168.100.254;
+    192.168.200.254;
 }
+
+...
+
+allow-recursion { 127.0.0.1; 192.168.100.0/24; 192.168.200.0/24; };
 ```
 
 Nous configurons les directions vers le fichier qui correspond au nom de domaine `.homelab` et pour le fichier qui va gérer la résolution inversée en `192.168.*.*`. On édite le fichier `/etc/bind/named.conf.default-zones`
@@ -152,6 +157,8 @@ On peut également vérifier que le service est bel et bien exécuter
 ```bash
 sudo systemctl status bind9
 ```
+
+> A partir du chapitre 9 - `ACME`, on peut créer et configurer également la zone `ng-hl.com` utilisée pour les services exposés (application du certificat wildcard *.ng-hl.com).
 
 ---
 

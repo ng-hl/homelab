@@ -40,10 +40,10 @@ Enfin, nous devons recharger la configuration courante.
 sudo sysctl -p
 ```
 
-A présent, nous changons le hostname de la VM pour que ce soit `kresus-vms.ng-hl.com`, puis nous modifions le contenu de son résolveur DNS local `/etc/hosts`
+A présent, nous changons le hostname de la VM pour que ce soit `kresus-vms.homelab`, puis nous modifions le contenu de son résolveur DNS local `/etc/hosts`
 
 ```bash
-sudo hostnamectl set-hostname kresus-vms.ng-hl.com
+sudo hostnamectl set-hostname kresus-vms.homelab
 ```
 
 Nous allons maintenant modifier la configuration du résolveur DNS de la machine.
@@ -107,30 +107,48 @@ dig +short google.com
 
 > Il est nécessaire d'installer `Docker engine` pour procéder à la mise en place de kresus via docker compose
 
-On créé le volume Docker pour avoir la persistance des données
+On créé le volume Docker pour avoir la persistance des données concernant la base de données Postgresql
 
 ```bash
-docker volume create kresus-data
+docker volume create pgdata
 ```
 
-Nous utilisons Docker compose pour disposer de deux container. Le premier étant celui qui porte l'applicatif kresus et le second va permettre de loadbalancer le traffic arrivant en HTTPS vers le container kresus
+Nous utilisons Docker compose pour disposer de deux container. Le premier étant celui qui porte l'applicatif kresus et le second va permettre de loadbalancer le traffic arrivant en HTTPS vers le container kresus. On créé le fichier `/opt/kresus/docker-compose.yml`
 
 ```bash
-version: "3"
-
+---
 services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: <db_user>
+      POSTGRES_PASSWORD: <db_password>
+      POSTGRES_DB: <db_name>
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
   kresus:
     image: bnjbvr/kresus
     container_name: kresus
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9876:9876"
+      - "9876:9876"
     volumes:
-      - kresus-data:/home/user/data
+      - ./config/kresus.cfg:/config/kresus.cfg:ro
     environment:
       - NODE_ENV=production
+      - KRESUS_DB_TYPE=postgres
+      - KRESUS_DB_HOST=postgres
+      - KRESUS_DB_PORT=5432
+      - KRESUS_DB_USERNAME=<db_user>
+      - KRESUS_DB_PASSWORD=<db_password>
+      - KRESUS_DB_NAME=<db_name>
+      - KRESUS_AUTH=<username>:<password>
+    depends_on:
+      - postgres
 
-  nginx:
+  kresus-nginx:
     image: nginx:stable-alpine
     container_name: kresus-nginx
     restart: unless-stopped
@@ -143,7 +161,43 @@ services:
       - kresus
 
 volumes:
-  kresus-data:
-    external: true
+  pgdata:
 ```
 
+Nous importons les éléments nécessaires au niveau du répertoire `/opt/kresus/certs` pour que le certificat wildcard puisse s'appliquer correctement.
+
+```bash
+mkdir -p /opt/kresus/certs
+```
+
+On se positionne en tant que root sur la vm `acme-core` qui contient le certificat et la clé privée associée, puis on téléverse les éléments au niveau de notre server `kresus-vms.homelab`
+
+```bash
+scp /etc/ssl/certs/wildcard.ng-hl.com/fullchain.pem ngobert@kresus-vms.homelab:/opt/kresus/certs/
+scp /etc/ssl/private/wildcard.ng-hl.com/privkey.key ngobert@kresus-vms.homelab:/opt/kresus/crets/privkey.pem
+```
+
+Nous créons le fichier de configuration de nginx `/opt/kresus/nginx/conf.d/kresus.conf`
+
+```bash
+server {
+    listen 443 ssl;
+    server_name kresus.ng-hl.com;
+
+    ssl_certificate     /etc/ssl/private/fullchain.pem;
+    ssl_certificate_key /etc/ssl/private/privkey.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass         http://kresus:9876;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+> Il est nécessaire d'autoriser le flux HTTPS depuis l'interface WAN de pfSense vers l'alias `kresus_vms` pointant vers l'ip `192.168.200.4` soit le service exposé `kresus.ng-hl.com`
